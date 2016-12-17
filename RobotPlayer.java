@@ -11,27 +11,27 @@ public class RobotPlayer {
      * If this method returns, the robot dies!
      **/
     @SuppressWarnings("unused")
-    public static void run(RobotController rc) {
+    public static void run(RobotController rc) throws Exception{
         switch (rc.getType()) {
-        case RobotType.ARCHON:
+        case ARCHON:
         	archon.run(rc);
         	break;
-        case RobotType.SCOUT:
+        case SCOUT:
         	scout.run(rc);
         	break;
-        case RobotType.SOILDER:
+        case SOLDIER:
         	soilder.run(rc);
         	break;
-        case RobotType.TURRET:
+        case TURRET:
         	turret.run(rc);
         	break;
-        case RobotType.VIPER:
+        case VIPER:
         	viper.run(rc);
         	break;
-        case RobotType.GUARD:
+        case GUARD:
         	guard.run(rc);
         	break;
-        }
+        
         }
     }
 }
