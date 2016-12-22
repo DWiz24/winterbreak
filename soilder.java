@@ -208,7 +208,19 @@ public class soilder {
 					
 				}
 				//end of enemy only code
-				else {
+				else if (dens!=0){
+					double minHP=9999;
+					RobotInfo target=null;
+					for (int i=dens-1; i>=0; i--) {
+						if (den[i].health<minHP) {
+							target=den[i];
+							minHP=target.health;
+						}
+					}
+					if (rc.getLocation().distanceSquaredTo(target.location)>13) {
+						tryToMove(rc.getLocation().directionTo(target.location),rc);
+					}
+				} else {
 					Direction toDest=rc.getLocation().directionTo(dest);
 					if (rc.getLocation().distanceSquaredTo(dest)<=10 ||!rc.onTheMap(rc.getLocation().add(toDest))) {
 						dest=rc.getLocation().add(dirs[rng.nextInt(8)],10);
