@@ -1,6 +1,7 @@
 package winterbreak;
 
 import battlecode.common.*;
+import java.util.Random;
 
 public class soilder {
 	/*Soldier priorities
@@ -22,6 +23,9 @@ public class soilder {
 	 *    
 	 */
 	static void run(RobotController rc)throws Exception {
+		Direction[] dirs={Direction.NORTH,Direction.NORTH_EAST,Direction.EAST,Direction.SOUTH_EAST,Direction.SOUTH,Direction.SOUTH_WEST,Direction.WEST,Direction.NORTH_WEST};
+		Random rng=new Random(rc.getID());
+		MapLocation dest=rc.getLocation().add(dirs[rng.nextInt(8)],10);
 		while (true) {
 			RobotInfo[] info=rc.senseNearbyRobots();
 			RobotInfo[] friend=new RobotInfo[info.length];
@@ -194,8 +198,52 @@ public class soilder {
 					rc.attackLocation(target.location);
 				}
 			}
-
+			//end of attack
+			if (rc.isCoreReady()) {
+				if (zombies!=0) {
+					
+				}
+				//end of zombie and/or enemy move
+				else if (enemies!=0) {
+					
+				}
+				//end of enemy only code
+				else {
+					Direction toDest=rc.getLocation().directionTo(dest);
+					if (rc.getLocation().distanceSquaredTo(dest)<=10 ||!rc.onTheMap(rc.getLocation().add(toDest))) {
+						dest=rc.getLocation().add(dirs[rng.nextInt(8)],10);
+					}
+					tryToMove(toDest,rc);
+				}
+				//end of no hostile code
+			}
+			//end of move
 		}
 	}
-
+	static void tryToMove(Direction d, RobotController rc) throws Exception {
+		if (rc.canMove(d)) {
+			rc.move(d);
+		} else if (rc.canMove(d.rotateLeft())) {
+			rc.move(d.rotateLeft());
+		} else if (rc.canMove(d.rotateRight())) {
+			rc.move(d.rotateRight());
+		} else {
+			MapLocation lm=rc.getLocation().add(d.rotateLeft());
+			MapLocation rm=rc.getLocation().add(d.rotateRight());
+			MapLocation fm=rc.getLocation().add(d);
+			boolean lvalid=rc.isLocationOccupied(lm)||!rc.onTheMap(lm);
+			boolean rvalid=rc.isLocationOccupied(rm)||!rc.onTheMap(rm);
+			boolean fvalid=rc.isLocationOccupied(fm)||!rc.onTheMap(fm);
+			double lrub=rc.senseRubble(lm);
+			double rrub=rc.senseRubble(rm);
+			double frub=rc.senseRubble(fm);
+			if (!fvalid&&(lvalid||lrub>=frub)&&(rvalid||rrub>=frub)) {
+				rc.clearRubble(d);
+			} else if (!lvalid&&(rvalid||rrub>=lrub)) {
+				rc.clearRubble(d.rotateLeft());
+			} else if (!rvalid) {
+				rc.clearRubble(d.rotateRight());
+			}
+		}
+	}
 }
