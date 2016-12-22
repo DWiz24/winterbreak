@@ -65,6 +65,96 @@ public class soilder {
 					}
 				}
 			}
+			if (rc.isCoreReady()) {
+				if (zombies!=0) {
+					Direction[] possMoves=new Direction[8];
+					int poss=0;
+					for (int i=7; i>=0; i--) {
+						if (rc.canMove(dirs[i])) {
+							possMoves[poss++]=dirs[i];
+						}
+					}
+					
+					int minTaken=99999;
+					boolean canHit=false;
+					int minClosest=9999;
+					MapLocation currloc=rc.getLocation();
+					for (int k=zombies-1; k>=0; k--) {
+						int dist=currloc.distanceSquaredTo(zomb[k].location);
+						canHit=canHit||dist<=13;
+						minClosest=Math.min(minClosest,dist);
+						if (dist<=zomb[k].type.attackRadiusSquared) {
+							minTaken+=zomb[k].attackPower;
+						}
+					}
+					for (int k=enemies-1; k>=0; k--) {
+						int dist=currloc.distanceSquaredTo(enemy[k].location);
+						canHit=canHit||dist<=13;
+						minClosest=Math.min(minClosest,dist);
+						if (dist<=enemy[k].type.attackRadiusSquared) {
+							minTaken+=enemy[k].attackPower;
+						}
+					}
+					Direction best=Direction.NONE;
+					for (int i=poss-1; i>=0; i--) {
+						boolean hitSomething=false;
+						int damage=0;
+						int closest=999;
+						MapLocation nloc=rc.getLocation().add(possMoves[i]);
+						for (int k=zombies-1; k>=0; k--) {
+							int dist=nloc.distanceSquaredTo(zomb[k].location);
+							hitSomething=hitSomething||dist<=13;
+							closest=Math.min(closest,dist);
+							if (dist<=zomb[k].type.attackRadiusSquared) {
+								damage+=zomb[k].attackPower;
+							}
+						}
+						for (int k=enemies-1; k>=0; k--) {
+							int dist=nloc.distanceSquaredTo(enemy[k].location);
+							hitSomething=hitSomething||dist<=13;
+							closest=Math.min(closest,dist);
+							if (dist<=enemy[k].type.attackRadiusSquared) {
+								damage+=enemy[k].attackPower;
+							}
+						}
+						if ((hitSomething&&!canHit)||(damage<minTaken||(damage==minTaken&&closest<minClosest))) {
+							canHit=hitSomething;
+							minTaken=damage;
+							minClosest=closest;
+							best=possMoves[i];
+						}
+					}
+					if (best!=Direction.NONE)
+					rc.move(best);
+				}
+				//end of zombie and/or enemy move
+				else if (enemies!=0) {
+					
+				}
+				//end of enemy only code
+				else if (dens!=0){
+					double minHP=9999;
+					RobotInfo target=null;
+					for (int i=dens-1; i>=0; i--) {
+						if (den[i].health<minHP) {
+							target=den[i];
+							minHP=target.health;
+						}
+					}
+					if (rc.getLocation().distanceSquaredTo(target.location)>13) {
+						tryToMove(rc.getLocation().directionTo(target.location),rc);
+					}
+				//end of den attack code
+				} else {
+					Direction toDest=rc.getLocation().directionTo(dest);
+					if (rc.getLocation().distanceSquaredTo(dest)<=10 ||!rc.onTheMap(rc.getLocation().add(toDest))) {
+						dest=rc.getLocation().add(dirs[rng.nextInt(8)],10);
+					}
+					tryToMove(toDest,rc);
+				}
+				//end of no hostile code
+			}
+			//end of move
 			if (rc.isWeaponReady()) {
 				int maxPri=-10000;
 				/*Priority System:
@@ -199,37 +289,7 @@ public class soilder {
 				}
 			}
 			//end of attack
-			if (rc.isCoreReady()) {
-				if (zombies!=0) {
-					
-				}
-				//end of zombie and/or enemy move
-				else if (enemies!=0) {
-					
-				}
-				//end of enemy only code
-				else if (dens!=0){
-					double minHP=9999;
-					RobotInfo target=null;
-					for (int i=dens-1; i>=0; i--) {
-						if (den[i].health<minHP) {
-							target=den[i];
-							minHP=target.health;
-						}
-					}
-					if (rc.getLocation().distanceSquaredTo(target.location)>13) {
-						tryToMove(rc.getLocation().directionTo(target.location),rc);
-					}
-				} else {
-					Direction toDest=rc.getLocation().directionTo(dest);
-					if (rc.getLocation().distanceSquaredTo(dest)<=10 ||!rc.onTheMap(rc.getLocation().add(toDest))) {
-						dest=rc.getLocation().add(dirs[rng.nextInt(8)],10);
-					}
-					tryToMove(toDest,rc);
-				}
-				//end of no hostile code
-			}
-			//end of move
+			Clock.yield();
 		}
 	}
 	static void tryToMove(Direction d, RobotController rc) throws Exception {
