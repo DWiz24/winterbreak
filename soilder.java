@@ -75,9 +75,9 @@ public class soilder {
 						}
 					}
 					
-					int minTaken=99999;
+					int minTaken=0;
 					boolean canHit=false;
-					int minClosest=9999;
+					double minClosest=9999;
 					MapLocation currloc=rc.getLocation();
 					for (int k=zombies-1; k>=0; k--) {
 						int dist=currloc.distanceSquaredTo(zomb[k].location);
@@ -99,7 +99,7 @@ public class soilder {
 					for (int i=poss-1; i>=0; i--) {
 						boolean hitSomething=false;
 						int damage=0;
-						int closest=999;
+						double closest=999;
 						MapLocation nloc=rc.getLocation().add(possMoves[i]);
 						for (int k=zombies-1; k>=0; k--) {
 							int dist=nloc.distanceSquaredTo(zomb[k].location);
@@ -117,6 +117,7 @@ public class soilder {
 								damage+=enemy[k].attackPower;
 							}
 						}
+						if (!possMoves[i].isDiagonal()) closest*=1.5;
 						if ((hitSomething&&!canHit)||(damage<minTaken||(damage==minTaken&&closest<minClosest))) {
 							canHit=hitSomething;
 							minTaken=damage;
