@@ -130,7 +130,44 @@ public class soilder {
 				}
 				//end of zombie and/or enemy move
 				else if (enemies!=0) {
+					Direction[] possMoves=new Direction[8];
+					int poss=0;
+					for (int i=7; i>=0; i--) {
+						if (rc.canMove(dirs[i])) {
+							possMoves[poss++]=dirs[i];
+						}
+					}
 					
+					int minTaken=0;
+					boolean canHit=false;
+					MapLocation currloc=rc.getLocation();
+					for (int k=enemies-1; k>=0; k--) {
+						int dist=currloc.distanceSquaredTo(enemy[k].location);
+						canHit=canHit||dist<=13;
+						if (dist<=enemy[k].type.attackRadiusSquared) {
+							minTaken+=enemy[k].attackPower;
+						}
+					}
+					Direction best=Direction.NONE;
+					for (int i=poss-1; i>=0; i--) {
+						boolean hitSomething=false;
+						int damage=0;
+						MapLocation nloc=rc.getLocation().add(possMoves[i]);
+						for (int k=enemies-1; k>=0; k--) {
+							int dist=nloc.distanceSquaredTo(enemy[k].location);
+							hitSomething=hitSomething||dist<=13;
+							if (dist<=enemy[k].type.attackRadiusSquared) {
+								damage+=enemy[k].attackPower;
+							}
+						}
+						if (damage<minTaken||(damage==minTaken&&hitSomething&&!canHit)) {
+							canHit=hitSomething;
+							minTaken=damage;
+							best=possMoves[i];
+						}
+					}
+					if (best!=Direction.NONE)
+					rc.move(best);
 				}
 				//end of enemy only code
 				else if (dens!=0){
