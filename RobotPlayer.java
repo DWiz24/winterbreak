@@ -26,8 +26,8 @@ public class RobotPlayer {
         	turret.run(rc);
         	break;
         case TTM:
-            turret.run(rc); //the turret's file will differentiate if in transport mode
-            break;
+                turret.run(rc); //the turret's file will differentiate if in transport mode
+                break;
         case VIPER:
         	viper.run(rc);
         	break;
