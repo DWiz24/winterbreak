@@ -1,7 +1,7 @@
 package winterbreak;
 
 import battlecode.common.*;
-
+import java.util.Random;
 public class turret  {
    /*
    Turret(+TTM) code:
