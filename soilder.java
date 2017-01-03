@@ -23,6 +23,7 @@ public class soilder {
 	 *    
 	 */
 	static void run(RobotController rc)throws Exception {
+		//System.out.println(rc.getInfectedTurns());
 		Direction[] dirs={Direction.NORTH,Direction.NORTH_EAST,Direction.EAST,Direction.SOUTH_EAST,Direction.SOUTH,Direction.SOUTH_WEST,Direction.WEST,Direction.NORTH_WEST};
 		Random rng=new Random(rc.getID());
 		MapLocation dest=rc.getLocation().add(dirs[rng.nextInt(8)],10);
