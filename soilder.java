@@ -25,6 +25,7 @@ public class soilder {
 	static MapLocation dest;
 	static boolean importantDest;
 	static RobotController strc;
+	static int lastMoveBroadcast=0;
 	static void run(RobotController rc)throws Exception {
 		//System.out.println(rc.getInfectedTurns());
 		strc=rc;
@@ -207,6 +208,9 @@ public class soilder {
 					if (rc.getLocation().distanceSquaredTo(target.location)>13) {
 						tryToMove(rc.getLocation().directionTo(target.location),rc);
 					}
+					if (rc.getRoundNum()-lastMoveBroadcast>40) {
+						rc.broadcastSignal(400);
+					}
 					//end of den attack code
 				} else {
 					Direction toDest=rc.getLocation().directionTo(dest);
@@ -386,6 +390,7 @@ public class soilder {
 					dest=si.getLocation();
 					distToDest=d;
 				}
+				lastMoveBroadcast=strc.getRoundNum();
 				break;
 			case 2:
 
