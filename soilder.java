@@ -22,11 +22,16 @@ public class soilder {
 	 *       stay near archons
 	 *    
 	 */
+	static MapLocation dest;
+	static boolean importantDest;
+	static RobotController strc;
 	static void run(RobotController rc)throws Exception {
 		//System.out.println(rc.getInfectedTurns());
+		strc=rc;
 		Direction[] dirs={Direction.NORTH,Direction.NORTH_EAST,Direction.EAST,Direction.SOUTH_EAST,Direction.SOUTH,Direction.SOUTH_WEST,Direction.WEST,Direction.NORTH_WEST};
 		Random rng=new Random(rc.getID());
 		MapLocation dest=rc.getLocation().add(dirs[rng.nextInt(8)],10);
+		boolean importantDest=false;
 		while (true) {
 			RobotInfo[] info=rc.senseNearbyRobots();
 			RobotInfo[] friend=new RobotInfo[info.length];
@@ -197,7 +202,7 @@ public class soilder {
 					//end of den attack code
 				} else {
 					Direction toDest=rc.getLocation().directionTo(dest);
-					if (rc.getLocation().distanceSquaredTo(dest)<=10 ||!rc.onTheMap(rc.getLocation().add(toDest))) {
+					if (rc.getLocation().distanceSquaredTo(dest)<=2 ||!rc.onTheMap(rc.getLocation().add(toDest))) {
 						dest=rc.getLocation().add(dirs[rng.nextInt(8)],10);
 					}
 					tryToMove(toDest,rc);
@@ -339,7 +344,45 @@ public class soilder {
 				}
 			}
 			//end of attack
+			if (Clock.getBytecodeNum()<2000) {
+				processSignals(rc.emptySignalQueue());
+			}
 			Clock.yield();
+		}
+	}
+	static void processSignals(Signal[] s) {
+		int distToDest=rc.getLocation().distanceSquaredTo(dest);
+		int len=s.length;
+		int[] counts=new int[32001];
+		int[] unique=new int[len];
+		int uniques=-1;
+		Team t=strc.getTeam();
+		for (int i=len-1;i>=0;i--) {
+			Signal si=s[i];
+			if (si.getTeam()==t&&si.getMessage()==null) {
+				int id=si.ID;
+				if (counts[id]==0) {
+					unique[++uniques]=i;
+					counts[id]=1;
+				} else {
+					counts[id]++;
+				}
+			}
+		}
+		for (i=uniques; i>=0; i--) {
+			Signal si=s[unique[i]];
+			switch (counts[s.getID()]) {
+				case 1:
+					int d=0;
+					if (!importantDest||d=si.getLocation().distanceSquaredTo(strc.getLocation())<distToDest) {
+						dest=si.getLocation();
+						distToDest=d;
+					}
+					break;
+				case 2:
+					
+					break;
+			}
 		}
 	}
 	static void tryToMove(Direction d, RobotController rc) throws Exception {
