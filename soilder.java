@@ -30,7 +30,7 @@ public class soilder {
 		strc=rc;
 		Direction[] dirs={Direction.NORTH,Direction.NORTH_EAST,Direction.EAST,Direction.SOUTH_EAST,Direction.SOUTH,Direction.SOUTH_WEST,Direction.WEST,Direction.NORTH_WEST};
 		Random rng=new Random(rc.getID());
-		MapLocation dest=rc.getLocation().add(dirs[rng.nextInt(8)],10);
+		dest=rc.getLocation().add(dirs[rng.nextInt(8)],10);
 		boolean importantDest=false;
 		while (true) {
 			RobotInfo[] info=rc.senseNearbyRobots();
@@ -139,23 +139,25 @@ public class soilder {
 					RobotInfo[] nohit=new RobotInfo[enemies];
 					int nohits=0;
 					for (int i=enemies-1; i>=0; i--) {
-						boolean valid=true;
-						for (int k=friends-1;k>=0; k--) {
-							if (enemy[i].type==RobotType.ARCHON || enemy[i].location.distanceSquaredTo(friend[k].location)<=enemy[i].type.attackRadiusSquared) {
-								valid=false;
-								break;
+						boolean valid=enemy[i].type.canAttack();
+						if (valid) {
+							for (int k=friends-1;k>=0; k--) {
+								if (enemy[i].location.distanceSquaredTo(friend[k].location)<=enemy[i].type.attackRadiusSquared) {
+									valid=false;
+									break;
+								}
+							}
+							if (valid) {
+								nohit[nohits++]=enemy[i];
 							}
 						}
-						if (valid) {
-							nohit[nohits++]=enemy[i];
-						}
 					}
-					//String indic="";
-					//for (int i=0; i<nohits; i++) {
-					//	indic=indic+" "+nohit[i].ID;
-					//}
-					//rc.setIndicatorString(0,indic);
-					int minNewHits=0;
+					String indic="";
+					for (int i=0; i<nohits; i++) {
+						indic=indic+" "+nohit[i].ID;
+					}
+					rc.setIndicatorString(0,indic);
+					int minNewHits=8;
 					boolean canHit=false;
 					Direction best=Direction.NONE;
 					for (int i=nohits-1; i>=0; i--) {
@@ -176,6 +178,12 @@ public class soilder {
 								newHits++;
 							}
 							hitSomething=hitSomething||dist<=13;
+						}
+						for (int i=enemies-1; i>=0; i--) {
+							if (enemy[i].location.distanceSquaredTo(nloc)<=13) {
+								hitSomething=true;
+								break;
+							}
 						}
 						if (hitSomething) newHits--;
 						if (newHits<minNewHits) {
@@ -351,7 +359,7 @@ public class soilder {
 		}
 	}
 	static void processSignals(Signal[] s) {
-		int distToDest=rc.getLocation().distanceSquaredTo(dest);
+		int distToDest=strc.getLocation().distanceSquaredTo(dest);
 		int len=s.length;
 		int[] counts=new int[32001];
 		int[] unique=new int[len];
@@ -360,7 +368,7 @@ public class soilder {
 		for (int i=len-1;i>=0;i--) {
 			Signal si=s[i];
 			if (si.getTeam()==t&&si.getMessage()==null) {
-				int id=si.ID;
+				int id=si.getID();
 				if (counts[id]==0) {
 					unique[++uniques]=i;
 					counts[id]=1;
@@ -369,19 +377,19 @@ public class soilder {
 				}
 			}
 		}
-		for (i=uniques; i>=0; i--) {
+		for (int i=uniques; i>=0; i--) {
 			Signal si=s[unique[i]];
-			switch (counts[s.getID()]) {
-				case 1:
-					int d=0;
-					if (!importantDest||d=si.getLocation().distanceSquaredTo(strc.getLocation())<distToDest) {
-						dest=si.getLocation();
-						distToDest=d;
-					}
-					break;
-				case 2:
-					
-					break;
+			switch (counts[si.getID()]) {
+			case 1:
+				int d=0;
+				if (!importantDest||((d=si.getLocation().distanceSquaredTo(strc.getLocation()))<distToDest)) {
+					dest=si.getLocation();
+					distToDest=d;
+				}
+				break;
+			case 2:
+
+				break;
 			}
 		}
 	}

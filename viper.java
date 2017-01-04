@@ -47,7 +47,7 @@ public class viper extends Inform {
 			Clock.yield();
 		}
 	}
-	private static void attack()
+	private static void attack() throws Exception
 	{
 		if (me.isWeaponReady() && me.getCoreDelay() >= type.cooldownDelay) 
 		{
