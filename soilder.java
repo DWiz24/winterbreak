@@ -208,9 +208,6 @@ public class soilder {
 					if (rc.getLocation().distanceSquaredTo(target.location)>13) {
 						tryToMove(rc.getLocation().directionTo(target.location),rc);
 					}
-					if (rc.getRoundNum()-lastMoveBroadcast>40) {
-						rc.broadcastSignal(400);
-					}
 					//end of den attack code
 				} else {
 					Direction toDest=rc.getLocation().directionTo(dest);
@@ -218,6 +215,10 @@ public class soilder {
 						dest=rc.getLocation().add(dirs[rng.nextInt(8)],10);
 					}
 					tryToMove(toDest,rc);
+				}
+				if (rc.getRoundNum()-lastMoveBroadcast>30&&(enemies!=0 || zombies!=0 || dens!=0)) {
+					rc.broadcastSignal(500);
+					lastMoveBroadcast=rc.getRoundNum();
 				}
 				//end of no hostile code
 			}
