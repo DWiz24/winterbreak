@@ -400,6 +400,33 @@ public class soilder {
 		}
 	}
 	static void tryToMove(Direction d, RobotController rc) throws Exception {
+		
+		if (rc.canMove(d)) {
+			rc.move(d);
+		} else if (rc.canMove(d.rotateLeft())) {
+			rc.move(d.rotateLeft());
+		} else if (rc.canMove(d.rotateRight())) {
+			rc.move(d.rotateRight());
+		} else {
+			MapLocation lm=rc.getLocation().add(d.rotateLeft());
+			MapLocation rm=rc.getLocation().add(d.rotateRight());
+			MapLocation fm=rc.getLocation().add(d);
+			boolean lvalid=rc.isLocationOccupied(lm)||!rc.onTheMap(lm);
+			boolean rvalid=rc.isLocationOccupied(rm)||!rc.onTheMap(rm);
+			boolean fvalid=rc.isLocationOccupied(fm)||!rc.onTheMap(fm);
+			double lrub=rc.senseRubble(lm);
+			double rrub=rc.senseRubble(rm);
+			double frub=rc.senseRubble(fm);
+			if (!fvalid&&(lvalid||lrub>=frub)&&(rvalid||rrub>=frub)) {
+				rc.clearRubble(d);
+			} else if (!lvalid&&(rvalid||rrub>=lrub)) {
+				rc.clearRubble(d.rotateLeft());
+			} else if (!rvalid) {
+				rc.clearRubble(d.rotateRight());
+			}
+		}
+	}
+	static void tryToMove(Direction d, RobotController rc) throws Exception {
 		if (rc.canMove(d)) {
 			rc.move(d);
 		} else if (rc.canMove(d.rotateLeft())) {
