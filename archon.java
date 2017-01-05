@@ -14,19 +14,19 @@ public class archon {
 			RobotType nxt=buildlist[nextBuild];
 			MapLocation here=rc.getLocation();
 			//Get all robots within the radius of the archon, find the one with the lowest health, heal it
-			RobotInfo[] everyone = rc.senseNearbyRobots();
+			RobotInfo[] everyone = rc.senseNearbyRobots(24);
 			double low = 9000.0;
-			int ilow = 0;
+			
 			MapLocation loc = null;
 			for(int i = 0; i < everyone.length; i++) {
 				if(rc.getTeam() == everyone[i].team) 
-					if(low > everyone[i].health) {
-						ilow = i;
+					if(low > everyone[i].health && everyone[i].type != RobotType.ARCHON) {
 						low = everyone[i].health;
 						loc = everyone[i].location; 
 					}
 			}
-			rc.repair(loc);
+			if(loc!=null)
+				rc.repair(loc);
 			//End healing code
 			
 			//Builds the next robot in line and puts it in the first possible place, if able to
