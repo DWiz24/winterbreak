@@ -16,7 +16,6 @@ public class archon {
 			//Get all robots within the radius of the archon, find the one with the lowest health, heal it
 			RobotInfo[] everyone = rc.senseNearbyRobots(24);
 			double low = 9000.0;
-			
 			MapLocation loc = null;
 			for(int i = 0; i < everyone.length; i++) {
 				if(rc.getTeam() == everyone[i].team) 
