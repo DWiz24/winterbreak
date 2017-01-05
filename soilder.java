@@ -214,7 +214,7 @@ public class soilder {
 					if (rc.getLocation().distanceSquaredTo(dest)<=2 ||!rc.onTheMap(rc.getLocation().add(toDest))) {
 						dest=rc.getLocation().add(dirs[rng.nextInt(8)],10);
 					}
-					tryToMove(toDest,rc);
+					tryToMoveNoRush(toDest,rc);
 				}
 				if (rc.getRoundNum()-lastMoveBroadcast>30&&(enemies!=0 || zombies!=0 || dens!=0)) {
 					rc.broadcastSignal(500);
@@ -399,29 +399,31 @@ public class soilder {
 			}
 		}
 	}
-	static void tryToMove(Direction d, RobotController rc) throws Exception {
-		
-		if (rc.canMove(d)) {
+	static void tryToMoveNoRush(Direction d, RobotController rc) throws Exception {
+		MapLocation lm=rc.getLocation().add(d.rotateLeft());
+		MapLocation rm=rc.getLocation().add(d.rotateRight());
+		MapLocation fm=rc.getLocation().add(d);
+		double lrub=rc.senseRubble(lm);
+		double rrub=rc.senseRubble(rm);
+		double frub=rc.senseRubble(fm);
+		if (frub<50&&rc.canMove(d)) {
 			rc.move(d);
-		} else if (rc.canMove(d.rotateLeft())) {
+		} else if (lrub<50&&rc.canMove(d.rotateLeft())) {
 			rc.move(d.rotateLeft());
-		} else if (rc.canMove(d.rotateRight())) {
+		} else if (rrub<50&&rc.canMove(d.rotateRight())) {
 			rc.move(d.rotateRight());
 		} else {
-			MapLocation lm=rc.getLocation().add(d.rotateLeft());
-			MapLocation rm=rc.getLocation().add(d.rotateRight());
-			MapLocation fm=rc.getLocation().add(d);
-			boolean lvalid=rc.isLocationOccupied(lm)||!rc.onTheMap(lm);
-			boolean rvalid=rc.isLocationOccupied(rm)||!rc.onTheMap(rm);
-			boolean fvalid=rc.isLocationOccupied(fm)||!rc.onTheMap(fm);
-			double lrub=rc.senseRubble(lm);
-			double rrub=rc.senseRubble(rm);
-			double frub=rc.senseRubble(fm);
-			if (!fvalid&&(lvalid||lrub>=frub)&&(rvalid||rrub>=frub)) {
+			boolean lvalid=!rc.isLocationOccupied(lm)&&rc.onTheMap(lm);
+			boolean rvalid=!rc.isLocationOccupied(rm)&&rc.onTheMap(rm);
+			boolean fvalid=!rc.isLocationOccupied(fm)&&rc.onTheMap(fm);
+			lrub=(lrub<50||!lvalid)?99999:lrub;
+			rrub=(rrub<50||!rvalid)?99999:rrub;
+			frub=(frub<50||!fvalid)?99999:frub;
+			if (fvalid&&frub<=lrub && frub<=rrub) {
 				rc.clearRubble(d);
-			} else if (!lvalid&&(rvalid||rrub>=lrub)) {
+			} else if (lvalid&&lrub<=rrub) {
 				rc.clearRubble(d.rotateLeft());
-			} else if (!rvalid) {
+			} else if (rvalid) {
 				rc.clearRubble(d.rotateRight());
 			}
 		}
