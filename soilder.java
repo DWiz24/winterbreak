@@ -26,6 +26,7 @@ public class soilder {
 	static boolean importantDest;
 	static RobotController strc;
 	static int lastMoveBroadcast=0;
+	static int lastArchonBroadcast=0;
 	static void run(RobotController rc)throws Exception {
 		//System.out.println(rc.getInfectedTurns());
 		strc=rc;
@@ -357,8 +358,17 @@ public class soilder {
 				}
 			}
 			//end of attack
+			Signal[] sigs=rc.emptySignalQueue();
 			if (Clock.getBytecodeNum()<2000) {
-				processSignals(rc.emptySignalQueue());
+				processSignals(sigs);
+				if (enemies==0&&zombies==0&&rc.getRoundNum()-lastArchonBroadcast>60) {
+					if (neutrals!=0||rc.sensePartLocations(-1).length!=0) {
+						lastArchonBroadcast=rc.getRoundNum();
+						rc.broadcastSignal(900);
+						rc.broadcastSignal(900);
+						rc.broadcastSignal(900);
+					}
+				}
 			}
 			Clock.yield();
 		}
@@ -393,9 +403,8 @@ public class soilder {
 				}
 				lastMoveBroadcast=strc.getRoundNum();
 				break;
-			case 2:
-
-				break;
+			case 3:
+				lastArchonBroadcast=strc.getRoundNum();
 			}
 		}
 	}
