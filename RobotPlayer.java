@@ -23,8 +23,6 @@ public class RobotPlayer {
         	soilder.run(rc);
         	break;
         case TURRET:
-        	turret.run(rc);
-        	break;
         case TTM:
                 turret.run(rc); //the turret's file will differentiate if in transport mode
                 break;
