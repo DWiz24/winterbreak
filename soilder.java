@@ -217,7 +217,7 @@ public class soilder {
 					}
 					tryToMoveNoRush(toDest,rc);
 				}
-				if (rc.getRoundNum()-lastMoveBroadcast>30&&(enemies!=0 || zombies!=0 || dens!=0)) {
+				if (rc.getRoundNum()-lastMoveBroadcast>20&&(enemies!=0 || zombies!=0 || dens!=0)) {
 					rc.broadcastSignal(500);
 					lastMoveBroadcast=rc.getRoundNum();
 				}

@@ -5,9 +5,9 @@ import battlecode.common.*;
 public class archon {
 	static void run(RobotController rc) throws Exception{
 		//really basic archon code, just build stuff
-		RobotType[] buildlist={RobotType.SOLDIER,RobotType.SOLDIER,RobotType.TURRET,RobotType.SCOUT,
-				RobotType.VIPER,RobotType.SOLDIER,RobotType.GUARD,RobotType.SOLDIER,RobotType.SOLDIER};
-		//RobotType[] buildlist={RobotType.SOLDIER};
+		//RobotType[] buildlist={RobotType.SOLDIER,RobotType.SOLDIER,RobotType.TURRET,RobotType.SCOUT,
+			//	RobotType.VIPER,RobotType.SOLDIER,RobotType.GUARD,RobotType.SOLDIER,RobotType.SOLDIER};
+		RobotType[] buildlist={RobotType.SOLDIER};
 		int nextBuild=0;
 		Direction[] dirs={Direction.NORTH,Direction.NORTH_EAST,Direction.EAST,Direction.SOUTH_EAST,Direction.SOUTH,Direction.SOUTH_WEST,Direction.WEST,Direction.NORTH_WEST};
 		while (true) {
