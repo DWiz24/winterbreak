@@ -41,6 +41,21 @@ public class archon {
 			}
 			//End building code
 			
+			//Looking for three blips from soldier. If get them, move towards that soldier bc there are parts and/or neutrals there.
+			Signal[] messages = rc.emptySignalQueue();
+			Signal sample = null;
+			int blips = 0;
+			for(Signal message:messages) {
+				if(message.getMessage() == null) {
+					blips++;
+					sample = message;
+				}
+			}
+			if(blips == 3) {
+				if(rc.canMove(rc.getLocation().directionTo(sample.getLocation())) && rc.isCoreReady()) {
+					rc.move(rc.getLocation().directionTo(sample.getLocation()));
+				}
+			}
 			Clock.yield();
 		}
 	}
